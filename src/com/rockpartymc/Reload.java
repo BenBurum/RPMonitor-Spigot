@@ -9,6 +9,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.scheduler.BukkitScheduler;
 
 /**
  *
@@ -17,25 +18,33 @@ import org.bukkit.command.CommandSender;
 public class Reload implements CommandExecutor {
     
     @Override
-    public boolean onCommand(CommandSender sender, Command smmonitor, String label, String[] args){
+    public boolean onCommand(CommandSender sender, Command olsmonitor, String label, String[] args){
+        if (sender.isOp()) {
             if (args.length > 0){
                     if (args[0].equals("reload")){
-                        sender.sendMessage("[SMMonitor] - Reloading config.");
+                        sender.sendMessage("[OLSMonitor] - Reloading config.");
+                        Bukkit.getServer().getScheduler().cancelTask(OLSMonitor.schedId);
+                        BukkitScheduler scheduler = OLSMonitor.getPlugin().getServer().getScheduler();
                         //reload the config file
-                        SMMonitor.getPlugin().reloadConfig();
-                        //attmept to reset the path for log file
-                        SMMonitor.setCustomPath();
+                        OLSMonitor.getPlugin().reloadConfig();
+                        //attmept to reset the path for monitordata file
+                        OLSMonitor.setCustomPath();
                         //get interval from config
-                        SMMonitor.interval = SMMonitor.getPlugin().getConfig().getInt("log-interval");
-                        System.out.println("[SMMonitor] - Log interval set to " + SMMonitor.interval + " ticks");
-                        Bukkit.getServer().getScheduler().cancelTask(SMMonitor.getPlugin().schedId);
-                        System.out.println("[SMMonitor] - restarting scheduler");
-                        SMMonitor.startScheduler();
+                        OLSMonitor.interval = OLSMonitor.getPlugin().getConfig().getInt("monitor-interval");
+                        System.out.println("[OLSMonitor] - Log interval set to " + OLSMonitor.interval + " ticks");
+                        
+                        System.out.println("[OLSMonitor] - restarting scheduler");
+                        OLSMonitor.startScheduler();
                     }
             }
-            else {
+                   else {
                 sender.sendMessage("Possible Commands: " + "/smm reload");
             }
+        }
+        else {
+            sender.sendMessage("[OLSMonitor - You do not have permission to use that command.");
+        }
+
         return true;
     }
     
